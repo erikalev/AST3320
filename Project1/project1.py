@@ -18,16 +18,16 @@ class project1:
 
     def S(self, r, Omega_k0):
         """ The function Sk(r) which returns different depending on the value of r (Omega_k0) """
-        if Omega_k0 > 1:
+        if Omega_k0 < 0:                             # K = +1
             return np.sin(r)
-        else:
+        else:                                        # K = -1
             return np.sinh(r)
 
 
     def integrate_z(self, z, Omega_m0, Omega_lambda0, Omega_k0):
         """ Integral that solves for t*H_0 """
         p = 1.0 + z
-        return 1.0/np.sqrt(Omega_m0*p**3 + Omega_k0*p**2 + Omega_lambda0)
+        return 1.0/(np.sqrt(Omega_m0*p**3 + Omega_k0*p**2 + Omega_lambda0))
 
     def integrate_time_z(self, z, Omega_m0, Omega_lambda0, Omega_k0):
         """Integral that solves for t(z)"""
@@ -74,9 +74,9 @@ class project1:
                     elif -0.02 <= Omega_k0 < 0.00:
                         omegas_lambda0_K2.append(Omega_lambda0)    # Saving value
                         omegas_m0_K2.append(Omega_m0)              # Saving value
-                    if z[k] > 0.84:                     # not interested in these values
+                    if z[k] > 0.84:                                # not interested in these values
                         break
-                    elif Omega_k0 == 0:                        # k = 0
+                    elif Omega_k0 == 0:                            # k = 0
                         dL[k] = (1 + z[k])*quad(self.integrate_z, 0, z[k], args = (Omega_m0, Omega_lambda0, Omega_k0))[0]
                     else:                               # using the S-function
                         dL[k]= (1 + z[k])/np.sqrt(abs(Omega_k0))*self.S(np.sqrt(abs(Omega_k0))*quad(self.integrate_z, 0, z[k], args = (Omega_m0, Omega_lambda0, Omega_k0))[0], Omega_k0)
@@ -106,6 +106,7 @@ class project1:
         plt.show()
 
     def test(self, Omega_m0, Omega_lambda0):
+        """ Method wich test the a_0/a criteria """
         x_test = np.linspace(0, 1, 100) # a_0/a test
         test = self.Omega_m0*x_test[1:]**(-3) + (1 - self.Omega_m0 - self.Omega_lambda0)*x_test[1:]**(-2) + self.Omega_lambda0
         for value in test:
@@ -116,6 +117,7 @@ class project1:
                 exit = False
     
     def run(self):        
+        """ This method runs the program. It calls the different methods and establishes the nessessary variables"""
         exit = False
         self.test(self.Omega_m0, self.Omega_lambda0)
         if exit == True:
